@@ -1,0 +1,29 @@
+---
+- name: Add Azure repository
+  apt_repository:
+    repo: "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-ubuntu-{{ ansible_distribution_release }}-prod/ {{ ansible_distribution_release }} main"
+    state: present
+  register: azure_repository
+
+- name: Add Azure signing key
+  apt_key:
+    keyserver: "packages.microsoft.com"
+    id: EB3E94ADBE1229CF
+  when: azure_repository.changed
+
+- name: Update packages
+  apt:
+    update_cache: True
+  when: azure_repository.changed
+
+- name: Install apt https transport
+  apt:
+    name: apt-transport-https
+    state: present
+
+- name: Install azcopy
+  apt:
+    name: azcopy
+
+- name: Put backup on Azure
+  shell: "azcopy --quiet --dest-key {{ backup_azure_access_key }} --source {{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}.tar.gz.gpg --destination https://{{ backup_azure_storage_account }}.blob.core.windows.net/{{ backup_azure_container }}/{{ backup_azure_target_dir }}/{{ timestamp.stdout }}/backup.tar.gz.gpg"

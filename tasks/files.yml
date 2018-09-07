@@ -1,0 +1,12 @@
+---
+- name: Files | Create directory for file backups
+  file:
+    state: directory
+    path: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}/files"
+
+- name: Files | Copy directories that should be backuped to backup path
+  shell: "cp -R {{ item.src }} {{ item.dest_name }}"
+  args:
+    chdir: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}/files"
+    creates: "{{ item.dest_name }}"
+  with_items: "{{ backup_files_paths }}"

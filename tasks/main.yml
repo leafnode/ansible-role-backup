@@ -1,0 +1,83 @@
+---
+- name: Execute pre backup commands
+  command: "{{ item.command }}"
+  args:
+    chdir: "{{ item.dir }}"
+  with_items: "{{ backup_pre_commands }}"
+
+- name: Create backup folder
+  file:
+    state: directory
+    path: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}"
+
+- name: Include PostgreSQL backup tasks
+  include: postgresql.yml
+  when: backup_postgresql == true
+
+- name: Include Redis backup tasks
+  include: redis.yml
+  when: backup_redis == true
+
+- name: Include Mysql backup tasks
+  include: mysql.yml
+  when: backup_mysql == true
+
+- name: Include MongoDB backup tasks
+  include: mongodb.yml
+  when: backup_mongodb == true
+
+- name: Include ElasticSearch backup tasks
+  include: elasticsearch.yml
+  when: backup_elasticsearch == true
+
+- name: Include files backup tasks
+  include: files.yml
+  when: backup_files == true
+
+- name: Generate list of files in backup
+  command: "find . -type f -exec ls -l {} \\;"
+  args:
+    chdir: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}"
+  register: file_list
+
+- name: Echo the list of files
+  debug:
+    msg: "{{ file_list.stdout_lines }}"
+
+- name: Archive backup folder
+  shell: "tar -zcvf {{ backup_folder_prefix }}{{ timestamp.stdout }}.tar.gz {{ backup_folder_prefix }}{{ timestamp.stdout }}"
+  args:
+    chdir: "{{ backup_tmp_path }}"
+
+- name: Remove backup tmp folder
+  file:
+    path: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}"
+    state: absent
+
+- name: Encrypt backup archive with gpg
+  shell: "gpg -c --passphrase={{ backup_gpg_passphrase }} {{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}.tar.gz"
+
+- name: Remove not encrypted backup archive
+  file:
+    path: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}.tar.gz"
+    state: absent
+
+- include: output-directory.yml
+  when: backup_to_directory == true
+
+- include: output-s3.yml
+  when: backup_to_s3 == true
+
+- include: output-azure.yml
+  when: backup_to_azure == true
+
+- name: Remove encrypted backup archive
+  file:
+    path: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}.tar.gz.gpg"
+    state: absent
+
+- name: Execute post backup commands
+  command: "{{ item.command }}"
+  args:
+    chdir: "{{ item.dir }}"
+  with_items: "{{ backup_post_commands }}"

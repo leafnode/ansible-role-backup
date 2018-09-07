@@ -1,0 +1,11 @@
+---
+- name: Install pip
+  apt:
+    name: python-pip
+
+- name: Install aws command line tool
+  pip:
+    name: awscli
+
+- name: Put backup on S3
+  shell: "AWS_ACCESS_KEY_ID={{ backup_s3_aws_access_key }} AWS_SECRET_ACCESS_KEY={{ backup_s3_aws_secret_key }} aws s3 cp {{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}.tar.gz.gpg s3://{{ backup_s3_bucket }}{{ backup_s3_target_dir }}/{{ timestamp.stdout }}/backup.tar.gz.gpg"

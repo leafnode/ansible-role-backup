@@ -1,0 +1,8 @@
+---
+- name: ElasticSearch | Create directory for elasticsearch backups
+  file:
+    state: directory
+    path: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}/elasticsearch"
+
+- name: ElasticSearch | Backup ElasticSearch index
+  shell: "cp -R /var/lib/elasticsearch/* {{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}/elasticsearch/"

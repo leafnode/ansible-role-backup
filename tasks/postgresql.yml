@@ -1,0 +1,24 @@
+---
+- name: PostgreSQL | Create directory for postgresql backups
+  file:
+    state: directory
+    path: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}/postgresql"
+
+- name: PostgreSQL | Backup postgresql database using password
+  shell: "PGPASSWORD={{ item.password }} pg_dump -Z 9 -U {{ item.username }} -h {{ backup_postgresql_host }} {{ item.database }} -f {{ item.database }}-{{ backup_postgresql_backup_file_name }}"
+  args:
+    chdir: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}/postgresql"
+    creates: "{{ backup_postgresql_backup_file_name }}"
+  with_items: "{{ backup_postgresql_dbs }}"
+
+- name: PostgreSQL | Register backup file state
+  stat:
+    path: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}/postgresql/{{ item.database }}-{{ backup_postgresql_backup_file_name }}"
+  with_items: "{{ backup_postgresql_dbs }}"
+  register: backup_state
+
+- name: PostgreSQL | Fail when backup was not created
+  fail:
+    msg: "One of backup files was not created"
+  with_items: "{{ backup_state.results }}"
+  when: item.stat.exists == false

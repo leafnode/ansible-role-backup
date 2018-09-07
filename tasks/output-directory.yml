@@ -1,0 +1,21 @@
+- name: Ensure backup dir exists
+  become: true
+  file:
+    path: "{{ backup_directory }}"
+    state: directory
+    mode: 0755
+
+- name: Copy backup file
+  shell: "cp {{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}.tar.gz.gpg {{ backup_directory }}/"
+
+- name: Generate list of files to be removed
+  shell: "ls -1t {{ backup_directory }} | tac | head -n-{{ backup_max_keep_files }}"
+  register: "backup_files_to_remove"
+  when: backup_max_keep_files != false
+
+- name: Remove old backups
+  file:
+    path: "{{ backup_directory }}/{{ item }}"
+    state: absent
+  with_items: "{{ backup_files_to_remove.stdout_lines }}"
+  when: backup_max_keep_files != false
