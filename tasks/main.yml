@@ -1,4 +1,9 @@
 ---
+- name: Install hashdeep
+  apt:
+    name: hashdeep
+    state: present
+
 - name: Execute pre backup commands
   command: "{{ item.command }}"
   args:
@@ -43,6 +48,9 @@
 - name: Echo the list of files
   debug:
     msg: "{{ file_list.stdout_lines }}"
+
+- name: Generate backup manifest
+  shell: "hashdeep -c md5 -r {{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }} > {{ backup_tmp_path }}/manifest-{{ timestamp.stdout }}"
 
 - name: Archive backup folder
   shell: "tar -zcvf {{ backup_folder_prefix }}{{ timestamp.stdout }}.tar.gz {{ backup_folder_prefix }}{{ timestamp.stdout }}"
