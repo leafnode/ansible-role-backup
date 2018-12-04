@@ -1,3 +1,4 @@
+---
 # Each command needs to be passed in following format:
 # - { command: "pwgen 20 1", dir: "/var/www/log" }
 backup_pre_commands: []

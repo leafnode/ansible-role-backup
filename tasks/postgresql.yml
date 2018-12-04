@@ -5,7 +5,7 @@
     path: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}/postgresql"
 
 - name: PostgreSQL | Backup postgresql database using password
-  shell: "PGPASSWORD={{ item.password }} pg_dump -Z 9 -U {{ item.username }} -h {{ backup_postgresql_host }} {{ item.database }} -f {{ item.database }}-{{ backup_postgresql_backup_file_name }}"
+  command: "PGPASSWORD={{ item.password }} pg_dump -Z 9 -U {{ item.username }} -h {{ backup_postgresql_host }} {{ item.database }} -f {{ item.database }}-{{ backup_postgresql_backup_file_name }}"
   args:
     chdir: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}/postgresql"
     creates: "{{ backup_postgresql_backup_file_name }}"

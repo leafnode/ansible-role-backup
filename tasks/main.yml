@@ -53,9 +53,9 @@
   shell: "hashdeep -c md5 -r {{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }} > {{ backup_tmp_path }}/manifest-{{ timestamp.stdout }}"
 
 - name: Archive backup folder
-  shell: "tar -zcvf {{ backup_folder_prefix }}{{ timestamp.stdout }}.tar.gz {{ backup_folder_prefix }}{{ timestamp.stdout }}"
-  args:
-    chdir: "{{ backup_tmp_path }}"
+  archive:
+    path: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}"
+    dest: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}.tar.gz"
 
 - name: Remove backup tmp folder
   file:
@@ -63,7 +63,7 @@
     state: absent
 
 - name: Encrypt backup archive with gpg
-  shell: "gpg -c --passphrase={{ backup_gpg_passphrase }} {{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}.tar.gz"
+  command: "gpg -c --passphrase={{ backup_gpg_passphrase }} {{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}.tar.gz"
 
 - name: Remove not encrypted backup archive
   file:

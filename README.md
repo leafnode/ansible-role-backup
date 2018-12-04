@@ -77,3 +77,7 @@ backup_azure_access_key: "change-me"
 backup_azure_target_dir: "/change-me"
 
 ```
+
+# Development
+
+Please check [development guide](DEVELOPMENT.md) for details about developing and testing this role.

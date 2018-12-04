@@ -5,7 +5,7 @@
     path: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}/files"
 
 - name: Files | Copy directories that should be backuped to backup path
-  shell: "cp -R {{ item.src }} {{ item.dest_name }}"
+  command: "cp -R {{ item.src }} {{ item.dest_name }}"
   args:
     chdir: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}/files"
     creates: "{{ item.dest_name }}"

@@ -5,7 +5,7 @@
     path: "{{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}/redis"
 
 - name: Redis | Copy redis dump to backup tmp folder
-  shell: "cp {{ backup_redis_save_path }}/dump.rdb {{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}/redis/"
+  command: "cp {{ backup_redis_save_path }}/dump.rdb {{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}/redis/"
 
 - name: Redis | Register backup file state
   stat:

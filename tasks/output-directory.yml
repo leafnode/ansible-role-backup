@@ -1,3 +1,4 @@
+---
 - name: Ensure backup dir exists
   become: true
   file:
@@ -6,10 +7,10 @@
     mode: 0755
 
 - name: Copy backup file
-  shell: "cp {{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}.tar.gz.gpg {{ backup_directory }}/"
+  command: "cp {{ backup_tmp_path }}/{{ backup_folder_prefix }}{{ timestamp.stdout }}.tar.gz.gpg {{ backup_directory }}/"
 
 - name: Copy manifest
-  shell: "cp {{ backup_tmp_path }}/manifest-{{ timestamp.stdout }} {{ backup_directory }}/manifest-{{ timestamp.stdout }}"
+  command: "cp {{ backup_tmp_path }}/manifest-{{ timestamp.stdout }} {{ backup_directory }}/manifest-{{ timestamp.stdout }}"
 
 - name: Generate list of files to be removed
   shell: "ls -1t {{ backup_directory }} | tac | head -n-{{ backup_max_keep_files }}"
