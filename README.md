@@ -1,6 +1,6 @@
 # backup
 
-[![Build Status](https://travis-ci.com/iroquoisorg/ansible-role-backup.svg?branch=master)](https://travis-ci.com/iroquoisorg/ansible-role-memcached)
+[![Build Status](https://travis-ci.com/iroquoisorg/ansible-role-backup.svg?branch=master)](https://travis-ci.com/iroquoisorg/ansible-role-backup)
 
 Ansible role for backup
 
@@ -13,6 +13,7 @@ This role was prepared and tested for Ubuntu 16.04.
 # Default settings
 
 ```
+---
 # Each command needs to be passed in following format:
 # - { command: "pwgen 20 1", dir: "/var/www/log" }
 backup_pre_commands: []
